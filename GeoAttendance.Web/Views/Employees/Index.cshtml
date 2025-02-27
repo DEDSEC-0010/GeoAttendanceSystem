@@ -1,0 +1,22 @@
+﻿@model List<GeoAttendance.Common.Models.Employee>
+<h2>Employees</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Add Employee</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var emp in Model)
+        {
+            <tr>
+                <td>@emp.Id</td>
+                <td>@emp.Name</td>
+                <td>@emp.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>

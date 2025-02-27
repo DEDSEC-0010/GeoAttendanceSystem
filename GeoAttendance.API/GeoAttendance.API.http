@@ -1,0 +1,6 @@
+@GeoAttendance.API_HostAddress = http://localhost:5201
+
+GET {{GeoAttendance.API_HostAddress}} 
+Accept: application/json
+
+###
