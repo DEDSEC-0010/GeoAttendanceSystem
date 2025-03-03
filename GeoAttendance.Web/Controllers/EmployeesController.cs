@@ -4,9 +4,10 @@ using GeoAttendance.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
 using GeoAttendance.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GeoAttendance.Web.Controllers;
-
+[Authorize(Policy = "AdminOnly")]
 public class EmployeesController : Controller
 {
     private readonly HttpClient _httpClient;
