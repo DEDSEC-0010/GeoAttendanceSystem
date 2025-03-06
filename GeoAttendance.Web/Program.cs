@@ -1,12 +1,15 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using GeoAttendance.Web;
+using GeoAttendance.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddControllersWithViews();
+
+
 builder.Services.AddHttpClient("API", client =>
 {
     client.BaseAddress = new Uri("http://localhost:5201/"); // Match API's HTTPS port
@@ -37,6 +40,8 @@ builder.Services.AddHttpClient("API", client =>
         new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
+builder.Services.AddHttpClient<IGeofenceService, GeofenceService>();
+builder.Services.AddHttpClient<IAttendanceService, AttendanceService>();
 
 
 // Build app
@@ -45,6 +50,6 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Employees}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

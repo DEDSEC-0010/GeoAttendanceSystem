@@ -4,6 +4,7 @@ using GeoAttendance.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeoAttendance.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305113322_AddGeofenceTable4")]
+    partial class AddGeofenceTable4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,14 +83,14 @@ namespace GeoAttendance.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("CenterLatitude")
+                    b.Property<float>("CenterLatitude")
                         .HasPrecision(9, 6)
-                        .HasColumnType("float")
+                        .HasColumnType("real(9)")
                         .HasColumnName("CenterLatitude");
 
-                    b.Property<double>("CenterLongitude")
+                    b.Property<float>("CenterLongitude")
                         .HasPrecision(9, 6)
-                        .HasColumnType("float")
+                        .HasColumnType("real(9)")
                         .HasColumnName("CenterLongitude");
 
                     b.Property<DateTime>("CreatedAt")
@@ -109,8 +112,8 @@ namespace GeoAttendance.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<double>("Radius")
-                        .HasColumnType("float");
+                    b.Property<float>("Radius")
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

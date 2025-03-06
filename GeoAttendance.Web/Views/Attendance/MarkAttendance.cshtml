@@ -1,20 +1,122 @@
-﻿@model GeoAttendance.Web.ViewModels.AttendanceViewModel
-<h2>Mark Attendance</h2>
-<form method="post">
-    <div class="form-group">
-        <label asp-for="EmployeeId"></label>
-        <input asp-for="EmployeeId" class="form-control" />
-        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+﻿@model AttendanceViewModel
+@{
+    ViewData["Title"] = "Mark Attendance";
+    var currentTime = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-clock"></i> Mark Attendance
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle"></i> Current Time (UTC): @currentTime
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
+                    <form asp-action="MarkAttendance" method="post" id="attendanceForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Latitude" id="latitude" />
+                        <input type="hidden" asp-for="Longitude" id="longitude" />
+                        <input type="hidden" asp-for="Timestamp" value="@DateTime.UtcNow" />
+
+                        <div id="map" style="height: 400px;" class="mb-4 rounded border"></div>
+
+                        <div class="text-center">
+                            <div id="locationStatus" class="alert alert-info">
+                                <i class="fas fa-spinner fa-spin"></i> Getting your location...
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg" id="markAttendanceBtn" disabled>
+                                <i class="fas fa-check-circle"></i> Mark Attendance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Latitude"></label>
-        <input asp-for="Latitude" class="form-control" step="any" />
-        <span asp-validation-for="Latitude" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Longitude"></label>
-        <input asp-for="Longitude" class="form-control" step="any" />
-        <span asp-validation-for="Longitude" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k" defer></script>
+    <script>
+        let map;
+        let marker;
+        const locationStatus = document.getElementById('locationStatus');
+        const markAttendanceBtn = document.getElementById('markAttendanceBtn');
+
+        function initMap(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.getElementById('latitude').value = latitude;
+            document.getElementById('longitude').value = longitude;
+
+            const location = { lat: latitude, lng: longitude };
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 17,
+                center: location,
+                mapTypeId: 'roadmap'
+            });
+
+            marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: 'Your Location'
+            });
+
+            locationStatus.classList.add('d-none');
+            markAttendanceBtn.disabled = false;
+        }
+
+        function handleLocationError(error) {
+            locationStatus.classList.remove('d-none');
+            locationStatus.classList.remove('alert-info');
+            locationStatus.classList.add('alert-danger');
+
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please enable location access to mark attendance.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Location request timed out.';
+                    break;
+                default:
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> An unknown error occurred.';
+                    break;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            locationStatus.classList.remove('d-none');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(initMap, handleLocationError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+            } else {
+                handleLocationError({ code: 0 });
+            }
+        });
+    </script>
+}

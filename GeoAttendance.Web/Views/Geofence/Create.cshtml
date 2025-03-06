@@ -1,0 +1,98 @@
+﻿@model GeofenceViewModel
+@{
+    ViewData["Title"] = "Create Geofence";
+}
+
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Create New Geofence</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @await Html.PartialAsync("_GeofenceForm", Model)
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k&callback=initMap" async defer></script>
+    <script>
+        let map;
+        let circle;
+        let marker;
+
+        function initMap() {
+            // Default to a central location (update as needed)
+            const defaultLat = 13.0827;
+            const defaultLng = 80.2707;
+            const defaultRadius = 100;
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: { lat: defaultLat, lng: defaultLng },
+                mapTypeId: 'roadmap'
+            });
+
+            // Create initial marker
+            marker = new google.maps.Marker({
+                position: { lat: defaultLat, lng: defaultLng },
+                map: map,
+                draggable: true
+            });
+
+            // Create initial circle
+            circle = new google.maps.Circle({
+                map: map,
+                radius: defaultRadius,
+                fillColor: '#FF0000',
+                fillOpacity: 0.2,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                editable: true
+            });
+
+            // Bind circle to marker
+            circle.bindTo('center', marker, 'position');
+
+            // Update form fields when marker is dragged
+            marker.addListener('dragend', updateFormFields);
+
+            // Update form fields when circle is resized
+            circle.addListener('radius_changed', updateFormFields);
+
+            // Allow clicking on map to move marker
+            map.addListener('click', function(e) {
+                marker.setPosition(e.latLng);
+                updateFormFields();
+            });
+
+            // Initial form update
+            updateFormFields();
+        }
+
+        function updateFormFields() {
+            const position = marker.getPosition();
+            document.getElementById('lat').value = position.lat().toFixed(6);
+            document.getElementById('lng').value = position.lng().toFixed(6);
+            document.getElementById('Radius').value = Math.round(circle.getRadius());
+        }
+
+        // Update circle radius when input changes
+        document.getElementById('Radius')?.addEventListener('input', function(e) {
+            if (circle) {
+                circle.setRadius(Number(e.target.value));
+            }
+        });
+    </script>
+}

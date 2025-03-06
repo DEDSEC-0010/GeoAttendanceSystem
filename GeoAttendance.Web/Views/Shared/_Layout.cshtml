@@ -3,26 +3,127 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - GeoAttendance</title>
+    <title>@ViewData["Title"] - GeoAttendance System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <!-- Your navigation content -->
-        </nav>
-    </header>
+    <div class="d-flex flex-column min-vh-100">
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="container-fluid">
+                    <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-location-dot me-2"></i>
+                        GeoAttendance
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody() <!-- Essential for content rendering -->
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                                   asp-controller="Home" asp-action="Index">
+                                    <i class="fas fa-home"></i> Home
+                                </a>
+                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Geofence" ? "active" : "")"
+                                       asp-controller="Geofence" asp-action="Index">
+                                        <i class="fas fa-map-marker-alt"></i> Manage Geofences
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
+                                       asp-controller="Reports" asp-action="Index">
+                                        <i class="fas fa-chart-bar"></i> Reports
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")"
+                                       asp-controller="Users" asp-action="Index">
+                                        <i class="fas fa-users"></i> Users
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Attendance" ? "active" : "")"
+                                       asp-controller="Attendance" asp-action="MarkAttendance">
+                                        <i class="fas fa-clock"></i> Mark Attendance
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Attendance" ? "active" : "")"
+                                       asp-controller="Attendance" asp-action="MyHistory">
+                                        <i class="fas fa-history"></i> My Attendance
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <!-- Right-aligned items -->
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    <i class="far fa-clock"></i>
+                                    <span id="utcTime"></span>
+                                </span>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle"></i>
+                                    @User.Identity?.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fas fa-id-card"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow-1 py-4">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
         </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <!-- Footer content -->
-    </footer>
+        <footer class="footer bg-light py-3 mt-auto border-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start">
+                        <span>&copy; @DateTime.Now.Year - GeoAttendance System</span>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <span class="text-muted">Version 1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
