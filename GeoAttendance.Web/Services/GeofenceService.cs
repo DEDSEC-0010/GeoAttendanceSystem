@@ -48,18 +48,47 @@ namespace GeoAttendance.Web.Services
             }
         }
 
-        public async Task<GeofenceViewModel> CreateGeofenceAsync(GeofenceViewModel geofence)
+        public async Task<GeofenceViewModel> CreateGeofenceAsync(GeofenceViewModel model)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(_baseUrl, geofence);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<GeofenceViewModel>()
-                    ?? throw new Exception("Failed to deserialize created geofence data");
+                // Create a DTO that matches the API's expected format
+                var createDto = new
+                {
+                    Name = model.Name,
+                    CenterLatitude = model.CenterLatitude,
+                    CenterLongitude = model.CenterLongitude,
+                    Radius = model.Radius,
+                    Description = model.Description
+                };
+
+                _logger.LogInformation("Attempting to create geofence: {@GeofenceData}", createDto);
+
+                var response = await _httpClient.PostAsJsonAsync(_baseUrl, createDto);
+
+                // Log the response for debugging
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("API Response: Status={StatusCode}, Content={Content}",
+                    response.StatusCode, responseContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("API returned error: {StatusCode}, {Content}",
+                        response.StatusCode, responseContent);
+                    throw new HttpRequestException($"API returned {response.StatusCode}: {responseContent}");
+                }
+
+                var createdGeofence = await response.Content.ReadFromJsonAsync<GeofenceViewModel>();
+                if (createdGeofence == null)
+                {
+                    throw new Exception("Failed to deserialize created geofence data");
+                }
+
+                return createdGeofence;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating geofence: {Name}", geofence.Name);
+                _logger.LogError(ex, "Error creating geofence: {Name}", model.Name);
                 throw;
             }
         }

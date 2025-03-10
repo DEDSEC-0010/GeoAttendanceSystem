@@ -20,7 +20,7 @@ public class GeofenceService
         return geofence;
     }
 
-    public async Task<Geofence?> GetGeofenceAsync(int id)
+    public async Task<Geofence> GetGeofenceAsync(int id)
     {
         return await _context.Geofences.FindAsync(id);
     }
@@ -46,15 +46,21 @@ public class GeofenceService
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public bool IsLocationWithinGeofence(double latitude, double longitude, Geofence geofence)
+    public bool IsLocationWithinGeofence(decimal latitude, decimal longitude, Geofence geofence)
     {
-        // Calculate distance between point and geofence center using Haversine formula
+        // Convert decimal to double for calculations
+        double lat1 = (double)latitude;
+        double lon1 = (double)longitude;
+        double lat2 = (double)geofence.CenterLatitude;
+        double lon2 = (double)geofence.CenterLongitude;
+        double radius = (double)geofence.Radius;
+
         const double earthRadius = 6371000; // Earth's radius in meters
 
-        var latRad1 = ToRadians(latitude);
-        var latRad2 = ToRadians(geofence.CenterLatitude);
-        var deltaLat = ToRadians(geofence.CenterLatitude - latitude);
-        var deltaLon = ToRadians(geofence.CenterLongitude - longitude);
+        var latRad1 = ToRadians(lat1);
+        var latRad2 = ToRadians(lat2);
+        var deltaLat = ToRadians(lat2 - lat1);
+        var deltaLon = ToRadians(lon2 - lon1);
 
         var a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
                 Math.Cos(latRad1) * Math.Cos(latRad2) *
@@ -63,10 +69,10 @@ public class GeofenceService
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         var distance = earthRadius * c;
 
-        return distance <= geofence.Radius;
+        return distance <= radius;
     }
 
-    public async Task<bool> IsLocationWithinAnyGeofenceAsync(double latitude, double longitude)
+    public async Task<bool> IsLocationWithinAnyGeofenceAsync(decimal latitude, decimal longitude)
     {
         var activeGeofences = await GetAllGeofencesAsync();
         return activeGeofences.Any(geofence => IsLocationWithinGeofence(latitude, longitude, geofence));

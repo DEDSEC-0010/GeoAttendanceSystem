@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GeoAttendance.API.Controllers;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class GeofenceController : ControllerBase
@@ -22,7 +22,7 @@ public class GeofenceController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+   // [Authorize(Roles = "Admin")]
     public async Task<ActionResult<GeofenceResponseDTO>> CreateGeofence([FromBody] GeofenceDTO dto)
     {
         try
@@ -38,9 +38,9 @@ public class GeofenceController : ControllerBase
             var geofence = new Geofence
             {
                 Name = dto.Name,
-                CenterLatitude = dto.CenterLatitude,
-                CenterLongitude = dto.CenterLongitude,
-                Radius = dto.Radius,
+                CenterLatitude = (double)dto.CenterLatitude,
+                CenterLongitude = (double)dto.CenterLongitude,
+                Radius = (double)dto.Radius,
                 Description = dto.Description,
                 CreatedAt = DateTime.UtcNow
             };
@@ -103,7 +103,7 @@ public class GeofenceController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateGeofence(int id, [FromBody] UpdateGeofenceDTO dto)
     {
         try
@@ -124,9 +124,9 @@ public class GeofenceController : ControllerBase
             }
 
             existingGeofence.Name = dto.Name;
-            existingGeofence.CenterLatitude = dto.CenterLatitude;
-            existingGeofence.CenterLongitude = dto.CenterLongitude;
-            existingGeofence.Radius = dto.Radius;
+            existingGeofence.CenterLatitude = (double)dto.CenterLatitude;
+            existingGeofence.CenterLongitude = (double)dto.CenterLongitude;
+            existingGeofence.Radius = (double)dto.Radius;
             existingGeofence.Description = dto.Description;
             existingGeofence.IsActive = dto.IsActive;
             existingGeofence.UpdatedAt = DateTime.UtcNow;
@@ -157,8 +157,8 @@ public class GeofenceController : ControllerBase
                 location.Latitude, location.Longitude);
 
             var isWithinGeofence = await _geofenceService.IsLocationWithinAnyGeofenceAsync(
-                location.Latitude,
-                location.Longitude
+                (decimal)location.Latitude,
+                (decimal)location.Longitude
             );
             
             _logger.LogInformation("Location check result: {Result}", 

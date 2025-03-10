@@ -38,8 +38,8 @@ public class AttendanceController : ControllerBase
 
             // Check if location is within any active geofence
             var isWithinGeofence = await _geofenceService.IsLocationWithinAnyGeofenceAsync(
-                (float)request.Latitude,
-                (float)request.Longitude
+                (decimal)request.Latitude,
+                (decimal)request.Longitude
             );
 
             var record = new AttendanceRecord

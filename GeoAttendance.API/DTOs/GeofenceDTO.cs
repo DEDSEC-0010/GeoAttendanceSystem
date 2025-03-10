@@ -3,9 +3,9 @@
 public class GeofenceDTO
 {
     public string Name { get; set; }
-    public double CenterLatitude { get; set; }
-    public double CenterLongitude { get; set; }
-    public double Radius { get; set; }
+    public decimal CenterLatitude { get; set; }  // Changed to decimal
+    public decimal CenterLongitude { get; set; } // Changed to decimal
+    public decimal Radius { get; set; }          // Changed to decimal
     public string Description { get; set; }
 }
 

@@ -1,9 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace GeoAttendance.Common.Models;
-
-[Table("Geofences")]
 public class Geofence
 {
     [Key]
@@ -13,13 +10,16 @@ public class Geofence
     [StringLength(100)]
     public string Name { get; set; }
 
-    [Column("CenterLatitude", TypeName = "float")]  // Explicitly specify SQL Server type
+    [Required]
+    [Column(TypeName = "float")]  // Use float without precision
     public double CenterLatitude { get; set; }
 
-    [Column("CenterLongitude", TypeName = "float")]  // Explicitly specify SQL Server type
+    [Required]
+    [Column(TypeName = "float")]  // Use float without precision
     public double CenterLongitude { get; set; }
 
-    [Column(TypeName = "float")]  // Explicitly specify SQL Server type
+    [Required]
+    [Column(TypeName = "float")]  // Use float without precision
     public double Radius { get; set; }
 
     [StringLength(500)]

@@ -26,7 +26,7 @@ namespace GeoAttendance.API.Migrations
                 scale: 6,
                 nullable: false,
                 oldClrType: typeof(float),
-                oldType: "real(9)",
+                oldType: "real",
                 oldPrecision: 9,
                 oldScale: 6);
 
@@ -38,7 +38,7 @@ namespace GeoAttendance.API.Migrations
                 scale: 6,
                 nullable: false,
                 oldClrType: typeof(float),
-                oldType: "real(9)",
+                oldType: "real",
                 oldPrecision: 9,
                 oldScale: 6);
         }
@@ -57,7 +57,7 @@ namespace GeoAttendance.API.Migrations
             migrationBuilder.AlterColumn<float>(
                 name: "CenterLongitude",
                 table: "Geofences",
-                type: "real(9)",
+                type: "real",
                 precision: 9,
                 scale: 6,
                 nullable: false,
@@ -69,7 +69,7 @@ namespace GeoAttendance.API.Migrations
             migrationBuilder.AlterColumn<float>(
                 name: "CenterLatitude",
                 table: "Geofences",
-                type: "real(9)",
+                type: "real",
                 precision: 9,
                 scale: 6,
                 nullable: false,

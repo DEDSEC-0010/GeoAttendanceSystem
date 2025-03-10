@@ -12,7 +12,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient("API", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5201/"); // Match API's HTTPS port
+    client.BaseAddress = new Uri("http://localhost:5201/");
+    client.DefaultRequestHeaders.Accept.Add(
+       new MediaTypeWithQualityHeaderValue("application/json"));                                   // Match API's HTTPS port
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -33,12 +35,6 @@ builder.Services.AddAuthorization(options =>
 });
 
 
-builder.Services.AddHttpClient("API", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
-    client.DefaultRequestHeaders.Accept.Add(
-        new MediaTypeWithQualityHeaderValue("application/json"));
-});
 
 builder.Services.AddHttpClient<IGeofenceService, GeofenceService>();
 builder.Services.AddHttpClient<IAttendanceService, AttendanceService>();

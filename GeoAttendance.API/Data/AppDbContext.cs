@@ -26,17 +26,6 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.Property(e => e.CenterLatitude)
-                .IsRequired()
-                .HasPrecision(9, 6);
-
-            entity.Property(e => e.CenterLongitude)
-                .IsRequired()
-                .HasPrecision(9, 6);
-
-            entity.Property(e => e.Radius)
-                .IsRequired();
-
             entity.Property(e => e.Description)
                 .HasMaxLength(500);
 
@@ -50,6 +39,18 @@ public class AppDbContext : DbContext
 
             entity.Property(e => e.UpdatedAt)
                 .IsRequired(false);
+
+            entity.Property(e => e.CenterLatitude)
+                .IsRequired()
+                .HasColumnType("float");  // Use float without precision
+
+            entity.Property(e => e.CenterLongitude)
+                .IsRequired()
+                .HasColumnType("float");  // Use float without precision
+
+            entity.Property(e => e.Radius)
+                .IsRequired()
+                .HasColumnType("float");  // Explicit decimal type
         });
 
         // Add index on IsActive to optimize queries for active geofences
