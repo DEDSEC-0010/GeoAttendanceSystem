@@ -1,4 +1,5 @@
 using GeoAttendance.API.Data;
+using GeoAttendance.API.Services;
 using GeoAttendance.Common.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
     )
 );
-
-
-
+// Register GeofenceService
+builder.Services.AddScoped<GeofenceService>();
 builder.Services.AddScoped<AuthService>();
 
 // Configure JWT Authentication
@@ -50,6 +50,7 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
+
 // Configure Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -101,7 +102,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Initialize database (optional for development)
+// Apply pending migrations
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -109,7 +110,6 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
-        // Seed initial data here if needed
     }
     catch (Exception ex)
     {

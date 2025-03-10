@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -27,22 +28,43 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var client = _clientFactory.CreateClient("API");
-        var response = await client.PostAsJsonAsync("api/auth/login", new
+        try
         {
-            Username = model.Username,
-            Password = model.Password
-        });
+            var client = _clientFactory.CreateClient("API");
+            var response = await client.PostAsJsonAsync("api/auth/login", new
+            {
+                Username = model.Username,
+                Password = model.Password
+            });
 
-        if (response.IsSuccessStatusCode)
-        {
-            var token = await response.Content.ReadAsStringAsync();
-            await CreateAuthCookie(token);
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError("", "Invalid login attempt");
+                return View(model);
+            }
+
+            var responseContent = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            if (string.IsNullOrEmpty(responseContent?.Token))
+            {
+                throw new InvalidOperationException("Token not received from API");
+            }
+
+            await CreateAuthCookie(responseContent.Token);
             return RedirectToAction("Index", "Home");
         }
+        catch (Exception ex)
+        {
+            
+            ModelState.AddModelError("", "Login service unavailable");
+            return View(model);
+        }
+    }
 
-        ModelState.AddModelError("", "Invalid login attempt");
-        return View(model);
+    // Add this class
+    public class LoginResponse
+    {
+        public string Token { get; set; }
     }
 
     [HttpGet]
@@ -80,21 +102,61 @@ public class AccountController : Controller
 
     private async Task CreateAuthCookie(string token)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jwtToken = handler.ReadJwtToken(token);
-
-        var identity = new ClaimsIdentity(jwtToken.Claims,
-            CookieAuthenticationDefaults.AuthenticationScheme);
-
-        var principal = new ClaimsPrincipal(identity);
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-            new AuthenticationProperties
+        try
+        {
+            if (string.IsNullOrEmpty(token))
             {
-                IsPersistent = true,
-                ExpiresUtc = jwtToken.ValidTo
-            });
+                throw new SecurityTokenException("Empty token received");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+
+            // Validate token structure first
+            if (!handler.CanReadToken(token))
+            {
+                throw new SecurityTokenMalformedException("Invalid token format");
+            }
+
+            var jwtToken = handler.ReadJwtToken(token);
+
+            // Ensure required claims exist
+            var nameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value
+                          ?? jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value
+                          ?? jwtToken.Subject;
+
+            var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value
+                          ?? jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
+                          ?? "Employee";
+
+            if (string.IsNullOrEmpty(nameClaim))
+            {
+                throw new SecurityTokenException("Username claim not found in token");
+            }
+
+            // Build claims identity
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, nameClaim),
+            new Claim(ClaimTypes.Role, roleClaim)
+        };
+
+            var identity = new ClaimsIdentity(claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = jwtToken.ValidTo
+                });
+        }
+        catch (Exception ex)
+        {
+            // Log the error here
+            
+            throw new SecurityTokenException("Invalid authentication token", ex);
+        }
     }
 }

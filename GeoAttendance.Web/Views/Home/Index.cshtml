@@ -1,8 +1,137 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Geo Attendance System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="display-4 mb-4">Welcome to Geo Attendance</h1>
+            <p class="lead">Smart attendance tracking with geofencing technology</p>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <div class="cta-buttons mt-5">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg mr-3">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+    <!-- Add this at the bottom of the hero-section div -->
+    <div id="globe-container" class="globe-overlay"></div>
 </div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <section class="dashboard-section py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Your Dashboard</h2>
+
+            <div class="row">
+                <!-- Attendance Statistics -->
+                <div class="col-md-4 mb-4">
+                    <div class="stat-card card h-100 shadow">
+                        <div class="card-body">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-check fa-3x text-primary"></i>
+                            </div>
+                            <h3 class="stat-value mt-3">28 Days</h3>
+                            <p class="stat-label">Present this month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Quick Actions</h5>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>Mark Attendance
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-file-invoice mr-2"></i>View Reports
+                                </a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-controller="Employees" asp-action="Index"
+                                       class="list-group-item list-group-item-action">
+                                        <i class="fas fa-users-cog mr-2"></i>Manage Employees
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Recent Activity</h5>
+                            <ul class="activity-list">
+                                <li>
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    Attendance marked - 09:00 AM
+                                </li>
+                                <li>
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    Late entry - 10:15 AM
+                                </li>
+                                <li>
+                                    <i class="fas fa-info-circle text-primary"></i>
+                                    Leave request approved
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Key Features</h2>
+        <div class="row">
+            <div class="col-md-4 feature-item mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-map-marked-alt fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="feature-title">Geofencing</h4>
+                        <p class="feature-description">Real-time location tracking with secure perimeter boundaries</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 feature-item mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-chart-line fa-3x text-success"></i>
+                        </div>
+                        <h4 class="feature-title">Analytics</h4>
+                        <p class="feature-description">Comprehensive reports and attendance statistics</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 feature-item mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-bell fa-3x text-warning"></i>
+                        </div>
+                        <h4 class="feature-title">Real-time Alerts</h4>
+                        <p class="feature-description">Instant notifications for attendance anomalies</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

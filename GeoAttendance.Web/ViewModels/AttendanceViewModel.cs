@@ -1,9 +1,14 @@
-﻿namespace GeoAttendance.Web.ViewModels
+﻿public class AttendanceViewModel
 {
-    public class AttendanceViewModel
-    {
-        public int EmployeeId { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-    }
+    public float EmployeeId { get; set; }
+    public float Latitude { get; set; }
+    public float Longitude { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+}
+
+public class AttendanceRecordViewModel
+{
+    public DateTime Timestamp { get; set; }
+    public string LocationName { get; set; }
+    public string Status { get; set; }
 }

@@ -1,0 +1,96 @@
+﻿@model GeofenceViewModel
+@{
+    ViewData["Title"] = "Edit Geofence";
+}
+
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Edit Geofence</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedAt" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @await Html.PartialAsync("_GeofenceForm", Model)
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k&callback=initMap" async defer></script>
+    <script>
+        let map;
+        let circle;
+        let marker;
+
+        function initMap() {
+            const initialLat = @Html.Raw(Model.CenterLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            const initialLng = @Html.Raw(Model.CenterLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            const initialRadius = @Model.Radius;
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: { lat: initialLat, lng: initialLng },
+                mapTypeId: 'roadmap'
+            });
+
+            // Create marker
+            marker = new google.maps.Marker({
+                position: { lat: initialLat, lng: initialLng },
+                map: map,
+                draggable: true
+            });
+
+            // Create circle
+            circle = new google.maps.Circle({
+                map: map,
+                radius: initialRadius,
+                fillColor: '#FF0000',
+                fillOpacity: 0.2,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                editable: true
+            });
+
+            // Bind circle to marker
+            circle.bindTo('center', marker, 'position');
+
+            // Update form fields when marker is dragged
+            marker.addListener('dragend', updateFormFields);
+
+            // Update form fields when circle is resized
+            circle.addListener('radius_changed', updateFormFields);
+
+            // Allow clicking on map to move marker
+            map.addListener('click', function(e) {
+                marker.setPosition(e.latLng);
+                updateFormFields();
+            });
+        }
+
+        function updateFormFields() {
+            const position = marker.getPosition();
+            document.getElementById('lat').value = position.lat().toFixed(6);
+            document.getElementById('lng').value = position.lng().toFixed(6);
+            document.getElementById('Radius').value = Math.round(circle.getRadius());
+        }
+
+        // Update circle radius when input changes
+        document.getElementById('Radius')?.addEventListener('input', function(e) {
+            if (circle) {
+                circle.setRadius(Number(e.target.value));
+            }
+        });
+    </script>
+}

@@ -1,38 +1,92 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using GeoAttendance.Web.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Json;
-using GeoAttendance.Common.Models;
 using Microsoft.AspNetCore.Authorization;
+using GeoAttendance.Web.Services;
+using GeoAttendance.Web.Models;
 
-namespace GeoAttendance.Web.Controllers;
-[Authorize(Policy = "EmployeeOnly")]
-public class AttendanceController : Controller
+namespace GeoAttendance.Web.Controllers
 {
-    private readonly HttpClient _httpClient;
-
-    public AttendanceController(IHttpClientFactory clientFactory)
+    [Authorize]
+    public class AttendanceController : Controller
     {
-        _httpClient = clientFactory.CreateClient("API");
-    }
+        private readonly IGeofenceService _geofenceService;
+        private readonly IAttendanceService _attendanceService;
+        private readonly ILogger<AttendanceController> _logger;
 
-    public IActionResult MarkAttendance() => View();
-
-    [HttpPost]
-    public async Task<IActionResult> MarkAttendance(AttendanceViewModel model)
-    {
-        var response = await _httpClient.PostAsJsonAsync("api/attendance", new
+        public AttendanceController(
+            IGeofenceService geofenceService,
+            IAttendanceService attendanceService,
+            ILogger<AttendanceController> logger)
         {
-            model.EmployeeId,
-            model.Latitude,
-            model.Longitude
-        });
-
-        if (response.IsSuccessStatusCode)
-        {
-            var record = await response.Content.ReadFromJsonAsync<AttendanceRecord>();
-            return View("AttendanceResult", record);
+            _geofenceService = geofenceService;
+            _attendanceService = attendanceService;
+            _logger = logger;
         }
-        return View("Error");
+
+        public IActionResult MarkAttendance()
+        {
+            // Initialize a new view model with current timestamp
+            var model = new AttendanceViewModel
+            {
+                Timestamp = DateTime.UtcNow
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAttendance(AttendanceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                // Ensure timestamp is set
+                model.Timestamp = DateTime.UtcNow;
+
+                var isWithinGeofence = await _geofenceService.CheckLocationAsync(
+                    model.Latitude,
+                    model.Longitude);
+
+                if (!isWithinGeofence)
+                {
+                    ModelState.AddModelError("", "You are not within any approved office location.");
+                    return View(model);
+                }
+
+                var result = await _attendanceService.MarkAttendanceAsync(model);
+                if (result)
+                {
+                    TempData["Success"] = "Attendance marked successfully!";
+                    return RedirectToAction(nameof(MyHistory));
+                }
+
+                ModelState.AddModelError("", "Failed to mark attendance. Please try again.");
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking attendance");
+                ModelState.AddModelError("", "An error occurred. Please try again.");
+                return View(model);
+            }
+        }
+
+        public async Task<IActionResult> MyHistory()
+        {
+            try
+            {
+                var history = await _attendanceService.GetUserAttendanceHistoryAsync();
+                return View(history);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching attendance history");
+                TempData["Error"] = "Could not load attendance history.";
+                return View(Enumerable.Empty<AttendanceRecordViewModel>());
+            }
+        }
     }
 }

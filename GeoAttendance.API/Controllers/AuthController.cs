@@ -28,7 +28,14 @@ namespace GeoAttendance.API.Controllers
             if (user == null) return Unauthorized();
 
             var token = _authService.GenerateToken(user);
-            return Ok(new { token });
+
+            // Return as object with Token property
+            return Ok(new LoginResponse { Token = token });
+        }
+
+        public class LoginResponse
+        {
+            public string Token { get; set; }
         }
 
         [HttpPost("register")]
