@@ -1,6 +1,6 @@
 ﻿@model GeoAttendance.Common.Models.AttendanceRecord
 <h2>Attendance Result</h2>
 <div class="alert @(Model.IsPresent ? "alert-success" : "alert-danger")">
-    @(Model.IsPresent ? "Present" : "Absent") at @Model.TimeStamp.ToString("g")
+    @(Model.IsPresent ? "Present" : "Absent") at @Model.Timestamp.ToString("g")
 </div>
 <p>Coordinates: @Model.Latitude, @Model.Longitude</p>

@@ -22,6 +22,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register GeofenceService
 builder.Services.AddScoped<GeofenceService>();
 builder.Services.AddScoped<AuthService>();
+// Add this line in your service registration section
+builder.Services.AddScoped<AttendanceService>();
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

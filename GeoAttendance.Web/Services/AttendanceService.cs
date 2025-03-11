@@ -1,32 +1,50 @@
-﻿using GeoAttendance.Web.Models;
-using System.Net.Http.Json;
-
+﻿using System.Net.Http.Json;
+using GeoAttendance.Web.Models;
+using GeoAttendance.Web.Services;
 namespace GeoAttendance.Web.Services
 {
     public class AttendanceService : IAttendanceService
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<AttendanceService> _logger;
-        private readonly string _baseUrl;
 
-        public AttendanceService(HttpClient httpClient, IConfiguration configuration, ILogger<AttendanceService> logger)
+        public AttendanceService(
+            HttpClient httpClient,
+            ILogger<AttendanceService> logger)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _baseUrl = configuration["ApiSettings:BaseUrl"] + "/api/attendance";
         }
 
-        public async Task<bool> MarkAttendanceAsync(AttendanceViewModel model)
+        public async Task<(bool Success, string Message)> MarkAttendanceAsync(AttendanceViewModel model)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/mark", model);
-                return response.IsSuccessStatusCode;
+                var response = await _httpClient.PostAsJsonAsync("api/attendance/mark", new
+                {
+                    Latitude = model.Latitude,
+                    Longitude = model.Longitude,
+                    Timestamp = DateTime.UtcNow,
+                    DeviceId = model.DeviceId
+                });
+
+                var content = await response.Content.ReadFromJsonAsync<dynamic>();
+                string message = content?.message ?? "Unknown response from server";
+
+                if (response.IsSuccessStatusCode)
+                {
+                    bool isPresent = content?.isPresent ?? false;
+                    string status = isPresent ? "Present" : "Absent";
+                    return (true, $"Attendance marked successfully. Status: {status}");
+                }
+
+                _logger.LogWarning("Failed to mark attendance: {Message}", message);
+                return (false, message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking attendance");
-                throw;
+                return (false, "An error occurred while marking attendance.");
             }
         }
 
@@ -34,7 +52,8 @@ namespace GeoAttendance.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<IEnumerable<AttendanceRecordViewModel>>($"{_baseUrl}/history");
+                var response = await _httpClient.GetFromJsonAsync<IEnumerable<AttendanceRecordViewModel>>(
+                    "api/attendance/history");
                 return response ?? Enumerable.Empty<AttendanceRecordViewModel>();
             }
             catch (Exception ex)
@@ -43,5 +62,7 @@ namespace GeoAttendance.Web.Services
                 throw;
             }
         }
+
+        
     }
 }
