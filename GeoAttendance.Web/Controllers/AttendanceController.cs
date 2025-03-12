@@ -84,7 +84,7 @@ namespace GeoAttendance.Web.Controllers
             new AttendanceRecordViewModel
             {
                 Id = 1,
-                Timestamp = DateTime.Parse("2025-03-11 04:30:00").ToUniversalTime(),
+                Timestamp = DateTime.Parse("2025-03-12 04:30:00").ToUniversalTime(),
                 LocationName = "Cognizant F3",
                 IsPresent = true,
                 Latitude = 13.049271m,

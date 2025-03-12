@@ -1,92 +1,111 @@
 ﻿@{
-    ViewData["Title"] = "Geo Attendance System";
+    ViewData["Title"] = "Welcome";
 }
 
 <div class="hero-section">
+    <div class="globe-overlay"></div>
     <div class="container">
         <div class="hero-content text-center">
-            <h1 class="display-4 mb-4">Welcome to Geo Attendance</h1>
-            <p class="lead">Smart attendance tracking with geofencing technology</p>
+            <h1 class="display-4 mb-4">Welcome to GeoAttendance</h1>
+            <p class="lead mb-5">Smart attendance tracking with geofencing technology</p>
             @if (!User.Identity.IsAuthenticated)
             {
-                <div class="cta-buttons mt-5">
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg mr-3">
-                        <i class="fas fa-sign-in-alt"></i> Login
+                <div class="cta-buttons">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
                     </a>
                     <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-user-plus"></i> Register
+                        <i class="fas fa-user-plus me-2"></i> Register
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="cta-buttons">
+                    <a asp-controller="Attendance" asp-action="MarkAttendance" class="btn btn-primary btn-lg">
+                        <i class="fas fa-clock me-2"></i> Mark Attendance
                     </a>
                 </div>
             }
         </div>
     </div>
-    <!-- Add this at the bottom of the hero-section div -->
-    <div id="globe-container" class="globe-overlay"></div>
 </div>
 
 @if (User.Identity.IsAuthenticated)
 {
     <section class="dashboard-section py-5">
         <div class="container">
-            <h2 class="section-title text-center mb-5">Your Dashboard</h2>
-
-            <div class="row">
-                <!-- Attendance Statistics -->
-                <div class="col-md-4 mb-4">
-                    <div class="stat-card card h-100 shadow">
-                        <div class="card-body">
-                            <div class="stat-icon">
-                                <i class="fas fa-calendar-check fa-3x text-primary"></i>
+            <div class="row g-4">
+                <!-- Quick Stats -->
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="d-flex align-items-center">
+                            <div class="icon me-3">
+                                <i class="fas fa-check-circle"></i>
                             </div>
-                            <h3 class="stat-value mt-3">28 Days</h3>
-                            <p class="stat-label">Present this month</p>
+                            <div>
+                                <div class="number">28</div>
+                                <div class="label">Present Days</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="d-flex align-items-center">
+                            <div class="icon me-3">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <div class="number">2</div>
+                                <div class="label">Absent Days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="d-flex align-items-center">
+                            <div class="icon me-3">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <div class="number">93%</div>
+                                <div class="label">Attendance Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Quick Actions</h5>
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-map-marker-alt mr-2"></i>Mark Attendance
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-file-invoice mr-2"></i>View Reports
-                                </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-controller="Employees" asp-action="Index"
-                                       class="list-group-item list-group-item-action">
-                                        <i class="fas fa-users-cog mr-2"></i>Manage Employees
+                            <h5 class="card-title mb-4">Quick Actions</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <a asp-controller="Attendance" asp-action="MarkAttendance"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-clock me-2"></i> Mark Attendance
                                     </a>
-                                }
+                                </div>
+                                <div class="col-md-4">
+                                    <a asp-controller="Attendance" asp-action="MyHistory"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-history me-2"></i> View History
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a asp-controller="Account" asp-action="Profile"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-user me-2"></i> My Profile
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <div class="card-body">
-                            <h5 class="card-title">Recent Activity</h5>
-                            <ul class="activity-list">
-                                <li>
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    Attendance marked - 09:00 AM
-                                </li>
-                                <li>
-                                    <i class="fas fa-exclamation-triangle text-warning"></i>
-                                    Late entry - 10:15 AM
-                                </li>
-                                <li>
-                                    <i class="fas fa-info-circle text-primary"></i>
-                                    Leave request approved
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -95,43 +114,23 @@
     </section>
 }
 
-<section class="features-section py-5 bg-light">
-    <div class="container">
-        <h2 class="section-title text-center mb-5">Key Features</h2>
-        <div class="row">
-            <div class="col-md-4 feature-item mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-map-marked-alt fa-3x text-primary"></i>
-                        </div>
-                        <h4 class="feature-title">Geofencing</h4>
-                        <p class="feature-description">Real-time location tracking with secure perimeter boundaries</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 feature-item mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-chart-line fa-3x text-success"></i>
-                        </div>
-                        <h4 class="feature-title">Analytics</h4>
-                        <p class="feature-description">Comprehensive reports and attendance statistics</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 feature-item mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-bell fa-3x text-warning"></i>
-                        </div>
-                        <h4 class="feature-title">Real-time Alerts</h4>
-                        <p class="feature-description">Instant notifications for attendance anomalies</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+@section Scripts {
+    <script>
+        // Update time with the specified format
+        function updateTime() {
+            const now = new Date();
+            const year = now.getUTCFullYear();
+            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(now.getUTCDate()).padStart(2, '0');
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+
+            document.getElementById('currentTime').textContent =
+                `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+}

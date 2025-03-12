@@ -14,6 +14,8 @@ namespace GeoAttendance.Web.Models
 
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
+        public int EmployeeId { get; set; }
+
         public string DeviceId { get; set; }
     }
 
