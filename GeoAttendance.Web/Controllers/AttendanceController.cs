@@ -5,7 +5,7 @@ using GeoAttendance.Web.Services;
 
 namespace GeoAttendance.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class AttendanceController : Controller
     {
         private readonly IAttendanceService _attendanceService;

@@ -1,0 +1,257 @@
+﻿/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #FF6B00;
+    --primary-hover: #E66000;
+    --dark-color: #000000;
+    --dark-gray: #222222;
+    --medium-gray: #444444;
+    --light-gray: #F5F5F5;
+    --white: #FFFFFF;
+    /* Font families */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-headings: 'Poppins', var(--font-primary);
+}
+
+/* Base Typography */
+body {
+    background-color: var(--light-gray);
+    color: var(--dark-color);
+    font-family: var(--font-primary);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--font-headings);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.display-4 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+/* Navigation */
+.navbar {
+    background-color: var(--dark-color);
+    font-weight: 500;
+}
+
+.navbar-brand {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--white);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: var(--primary-color);
+    }
+
+/* Buttons */
+.btn {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+.btn-outline-light:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: var(--dark-color);
+    color: var(--white);
+    font-weight: 500;
+    border-top-left-radius: 12px !important;
+    border-top-right-radius: 12px !important;
+    padding: 1rem 1.25rem;
+}
+
+/* Forms */
+.form-control {
+    font-size: 0.95rem;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.25);
+    }
+
+.form-label {
+    font-weight: 500;
+    color: var(--medium-gray);
+    margin-bottom: 0.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--dark-color) 0%, var(--medium-gray) 100%);
+    color: var(--white);
+    padding: 6rem 0;
+}
+
+.hero-content h1 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.hero-content .lead {
+    font-size: 1.25rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* Stats and Dashboard */
+.stat-card {
+    background: var(--white);
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-value {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--medium-gray);
+    font-weight: 500;
+}
+
+/* List groups */
+.list-group-item {
+    padding: 1rem 1.25rem;
+    border: none;
+    border-bottom: 1px solid var(--light-gray);
+    font-weight: 500;
+}
+
+    .list-group-item:hover {
+        background-color: var(--light-gray);
+    }
+
+    .list-group-item i {
+        color: var(--primary-color);
+    }
+
+/* Activity list */
+.activity-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+    .activity-list li {
+        padding: 0.875rem 0;
+        border-bottom: 1px solid var(--light-gray);
+        font-size: 0.95rem;
+    }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-list li i {
+            color: var(--primary-color);
+        }
+
+/* Features section */
+.feature-title {
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+.feature-description {
+    color: var(--medium-gray);
+    font-size: 0.95rem;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--dark-color);
+    color: var(--white);
+    font-size: 0.95rem;
+}
+
+/* Utilities */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-dark {
+    color: var(--dark-color) !important;
+}
+
+.section-title {
+    font-weight: 700;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+}
+
+    .dropdown-item i {
+        width: 1.5rem;
+    }
+
+/* Responsive typography */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+
+    .lead {
+        font-size: 1.1rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+}
