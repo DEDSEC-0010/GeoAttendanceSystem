@@ -1,0 +1,163 @@
+﻿@model IEnumerable<GeofenceViewModel>
+@{
+    ViewData["Title"] = "Geofence Map";
+}
+
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="card-title">Geofence Map View</h3>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            <div id="map" style="height: 600px; width: 100%;" class="mb-4"></div>
+
+            <div class="table-responsive mt-4">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Radius</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var geofence in Model)
+                        {
+                            <tr>
+                                <td>@geofence.Name</td>
+                                <td>@geofence.Radius.ToString("F0") m</td>
+                                <td>
+                                    @if (geofence.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="centerMapOn(@geofence.CenterLatitude, @geofence.CenterLongitude)">
+                                        <i class="fas fa-map-marker-alt"></i> Center
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k"></script>
+    <script>
+        let map;
+        let geofenceCircles = [];
+        const geofences = @Json.Serialize(Model);
+
+        function initMap() {
+            // Default center (will be adjusted based on geofences)
+            const defaultCenter = { lat: 0, lng: 0 };
+
+            // Create map
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: defaultCenter,
+                mapTypeId: 'roadmap',
+                mapTypeControl: true,
+                fullscreenControl: true,
+                streetViewControl: false,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+                }
+            });
+
+            // Add geofences to map
+            const bounds = new google.maps.LatLngBounds();
+
+            geofences.forEach(geofence => {
+                const center = {
+                    lat: geofence.centerLatitude,
+                    lng: geofence.centerLongitude
+                };
+
+                // Create circle for geofence
+                const circle = new google.maps.Circle({
+                    strokeColor: geofence.isActive ? '#28a745' : '#6c757d',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: geofence.isActive ? '#28a745' : '#6c757d',
+                    fillOpacity: 0.35,
+                    map,
+                    center: center,
+                    radius: geofence.radius
+                });
+
+                // Add info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div style="padding: 10px;">
+                            <h6 style="margin: 0 0 8px 0;">${geofence.name}</h6>
+                            <p style="margin: 0;">Radius: ${geofence.radius.toFixed(0)}m</p>
+                            <p style="margin: 5px 0;">Status: ${geofence.isActive ? 'Active' : 'Inactive'}</p>
+                            <p style="margin: 0;">
+                                <small>
+                                    Lat: ${geofence.centerLatitude.toFixed(6)}<br>
+                                    Lng: ${geofence.centerLongitude.toFixed(6)}
+                                </small>
+                            </p>
+                        </div>`
+                });
+
+                // Add click listener to circle
+                circle.addListener('click', () => {
+                    infoWindow.setPosition(center);
+                    infoWindow.open(map);
+                });
+
+                // Store circle reference
+                geofenceCircles.push({
+                    circle: circle,
+                    center: center,
+                    infoWindow: infoWindow
+                });
+
+                // Extend bounds to include this geofence
+                bounds.extend(center);
+            });
+
+            // Fit map to show all geofences if there are any
+            if (geofences.length > 0) {
+                map.fitBounds(bounds);
+            }
+        }
+
+        function centerMapOn(lat, lng) {
+            const center = { lat: lat, lng: lng };
+            map.setCenter(center);
+            map.setZoom(15);
+
+            // Close any open info windows
+            geofenceCircles.forEach(gc => gc.infoWindow.close());
+
+            // Find and open the info window for the centered geofence
+            const geofenceCircle = geofenceCircles.find(gc =>
+                gc.center.lat === lat && gc.center.lng === lng
+            );
+            if (geofenceCircle) {
+                geofenceCircle.infoWindow.setPosition(center);
+                geofenceCircle.infoWindow.open(map);
+            }
+        }
+
+        // Initialize map when page loads
+        window.onload = initMap;
+    </script>
+}

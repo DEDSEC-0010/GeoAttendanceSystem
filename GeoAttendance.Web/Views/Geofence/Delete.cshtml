@@ -1,0 +1,71 @@
+﻿@model GeofenceViewModel
+@{
+    ViewData["Title"] = "Delete Geofence";
+}
+
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title mb-4">Delete Geofence</h3>
+
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Are you sure you want to delete this geofence? This action cannot be undone.
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Name)</dt>
+                        <dd class="col-sm-8">@Model.Name</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CenterLatitude)</dt>
+                        <dd class="col-sm-8">@Model.CenterLatitude.ToString("F6")</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CenterLongitude)</dt>
+                        <dd class="col-sm-8">@Model.CenterLongitude.ToString("F6")</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Radius)</dt>
+                        <dd class="col-sm-8">@Model.Radius.ToString("F0") m</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Description)</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Description) ? "N/A" : Model.Description)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.IsActive)</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                    <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                    <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("g")</dd>
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                                <dt class="col-sm-4">Last Updated</dt>
+                                <dd class="col-sm-8">@Model.UpdatedAt.Value.ToString("g")</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
