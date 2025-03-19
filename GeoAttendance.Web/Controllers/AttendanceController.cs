@@ -40,11 +40,16 @@ namespace GeoAttendance.Web.Controllers
                 return View(model);
             }
 
+            if (!model.AuthenticationCompleted)
+            {
+                ModelState.AddModelError("", "Device authentication is required to mark attendance.");
+                return View(model);
+            }
+
             try
             {
-                _logger.LogInformation(
-                    "Attempting to mark attendance. Location: ({Latitude}, {Longitude})",
-                    model.Latitude, model.Longitude);
+                // Ensure timestamp is set
+                model.Timestamp = DateTime.UtcNow;
 
                 var isWithinGeofence = await _geofenceService.CheckLocationAsync(
                     (float)model.Latitude,
@@ -52,24 +57,27 @@ namespace GeoAttendance.Web.Controllers
 
                 if (!isWithinGeofence)
                 {
-                    ModelState.AddModelError("", "You must be within an approved office location to mark attendance.");
+                    ModelState.AddModelError("", "You are not within any approved office location.");
                     return View(model);
                 }
 
-                var (success, message) = await _attendanceService.MarkAttendanceAsync(model);
-                if (success)
+                var result = await _attendanceService.MarkAttendanceAsync(model);
+                if (result.Success)
                 {
-                    TempData["Success"] = message;
+                    TempData["Success"] = "Attendance marked successfully!";
                     return RedirectToAction(nameof(MyHistory));
                 }
 
-                ModelState.AddModelError("", message);
+                ModelState.AddModelError("", result.Message);
+                return View(model);
+
+                ModelState.AddModelError("", "Failed to mark attendance. Please try again.");
                 return View(model);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking attendance");
-                ModelState.AddModelError("", "An error occurred while marking attendance.");
+                ModelState.AddModelError("", "An error occurred. Please try again.");
                 return View(model);
             }
         }

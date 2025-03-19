@@ -30,6 +30,7 @@
                         <input type="hidden" asp-for="Latitude" id="latitude" />
                         <input type="hidden" asp-for="Longitude" id="longitude" />
                         <input type="hidden" asp-for="Timestamp" value="@DateTime.UtcNow" />
+                        <input type="hidden" id="authenticationCompleted" name="AuthenticationCompleted" value="false" />
 
                         <div id="map" style="height: 400px;" class="mb-4 rounded border"></div>
 
@@ -37,7 +38,7 @@
                             <div id="locationStatus" class="alert alert-info">
                                 <i class="fas fa-spinner fa-spin"></i> Getting your location...
                             </div>
-                            <button type="submit" class="btn btn-primary btn-lg" id="markAttendanceBtn" disabled>
+                            <button type="button" class="btn btn-primary btn-lg" id="markAttendanceBtn" disabled>
                                 <i class="fas fa-check-circle"></i> Mark Attendance
                             </button>
                         </div>
@@ -53,11 +54,14 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k" defer></script>
+    <script src="~/js/deviceAuth.js"></script>
     <script>
         let map;
         let marker;
         const locationStatus = document.getElementById('locationStatus');
         const markAttendanceBtn = document.getElementById('markAttendanceBtn');
+        const attendanceForm = document.getElementById('attendanceForm');
+        const authenticator = new DeviceAuthenticator();
 
         function initMap(position) {
             const latitude = position.coords.latitude;
@@ -84,6 +88,21 @@
             markAttendanceBtn.disabled = false;
         }
 
+        async function handleAttendanceMarkingClick() {
+            try {
+                const authenticated = await authenticator.authenticate();
+                if (authenticated) {
+                    document.getElementById('authenticationCompleted').value = 'true';
+                    attendanceForm.submit();
+                } else {
+                    alert('Authentication failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                alert('An error occurred during authentication. Please try again.');
+            }
+        }
+
         function handleLocationError(error) {
             locationStatus.classList.remove('d-none');
             locationStatus.classList.remove('alert-info');
@@ -107,6 +126,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             locationStatus.classList.remove('d-none');
+            markAttendanceBtn.addEventListener('click', handleAttendanceMarkingClick);
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(initMap, handleLocationError, {

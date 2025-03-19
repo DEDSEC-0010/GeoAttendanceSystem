@@ -17,6 +17,8 @@ namespace GeoAttendance.Web.Models
         public int EmployeeId { get; set; }
 
         public string DeviceId { get; set; }
+
+        public bool AuthenticationCompleted { get; set; }
     }
 
     public class AttendanceRecordViewModel
