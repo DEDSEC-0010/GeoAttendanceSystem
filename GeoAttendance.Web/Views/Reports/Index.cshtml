@@ -1,0 +1,105 @@
+﻿@model AttendanceReportViewModel
+@{
+    ViewData["Title"] = "Attendance Reports";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-bar me-2"></i>Attendance Reports
+            </h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="post" class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="StartDate" class="form-label"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="EndDate" class="form-label"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="EmployeeId" class="form-label"></label>
+                    <select asp-for="EmployeeId" asp-items="Model.Employees" class="form-select">
+                        <option value="">-- All Employees --</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Generate Report
+                    </button>
+                </div>
+            </form>
+
+            @if (Model.AttendanceRecords.Any())
+            {
+                <div class="mt-4">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="Export"
+                           asp-route-startDate="@Model.StartDate.ToString("yyyy-MM-dd")"
+                           asp-route-endDate="@Model.EndDate.ToString("yyyy-MM-dd")"
+                           asp-route-employeeId="@Model.EmployeeId"
+                           class="btn btn-success">
+                            <i class="fas fa-file-export me-2"></i>Export to CSV
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var record in Model.AttendanceRecords)
+                                {
+                                    <tr>
+                                        <td>@record.EmployeeName</td>
+                                        <td>@record.Timestamp.ToString("yyyy-MM-dd")</td>
+                                        <td>@record.Timestamp.ToString("HH:mm:ss")</td>
+                                        <td>
+                                            <span class="badge bg-@(record.IsPresent ? "success" : "danger")">
+                                                @(record.IsPresent ? "Present" : "Absent")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="https://www.google.com/maps?q=@record.Latitude,@record.Longitude"
+                                               target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else if (Model.AttendanceRecords != null)
+            {
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i>No attendance records found for the selected criteria.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Initialize any JavaScript functionality here
+        });
+    </script>
+}

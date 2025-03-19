@@ -1,0 +1,99 @@
+﻿@model IEnumerable<GeofenceViewModel>
+@{
+    ViewData["Title"] = "Geofence Map View";
+}
+
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Geofence Map Overview</h3>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Back to List
+            </a>
+        </div>
+        <div class="card-body">
+            <div id="map" style="height: 700px;" class="border rounded"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnoeDwjL9MsEMLJ8fxbUiK91uk7ukNq9k&callback=initMap" async defer></script>
+    <script>
+        let map;
+        let geofences = @Html.Raw(Json.Serialize(Model));
+
+        function initMap() {
+            // Initialize the map centered on the first geofence, or a default location if no geofences exist
+            const defaultCenter = { lat: 13.0827, lng: 80.2707 }; // Default center
+            const firstGeofence = geofences.length > 0 ? {
+                lat: geofences[0].centerLatitude,
+                lng: geofences[0].centerLongitude
+            } : defaultCenter;
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: firstGeofence,
+                mapTypeId: 'roadmap'
+            });
+
+            // Create markers and circles for each geofence
+            geofences.forEach(geofence => {
+                // Create marker
+                const marker = new google.maps.Marker({
+                    position: {
+                        lat: geofence.centerLatitude,
+                        lng: geofence.centerLongitude
+                    },
+                    map: map,
+                    title: geofence.name
+                });
+
+                // Create circle
+                const circle = new google.maps.Circle({
+                    map: map,
+                    center: {
+                        lat: geofence.centerLatitude,
+                        lng: geofence.centerLongitude
+                    },
+                    radius: geofence.radius,
+                    fillColor: geofence.isActive ? '#28a745' : '#6c757d',
+                    fillOpacity: 0.2,
+                    strokeColor: geofence.isActive ? '#28a745' : '#6c757d',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2
+                });
+
+                // Add info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div>
+                            <h6>${geofence.name}</h6>
+                            <p>${geofence.description || 'No description'}</p>
+                            <p>Radius: ${geofence.radius}m</p>
+                            <p>Status: ${geofence.isActive ? 'Active' : 'Inactive'}</p>
+                            <a href="/Geofence/Edit/${geofence.id}" class="btn btn-sm btn-primary">Edit</a>
+                        </div>
+                    `
+                });
+
+                // Add click listener to marker to show info window
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+
+            // Adjust map bounds to fit all geofences
+            if (geofences.length > 0) {
+                const bounds = new google.maps.LatLngBounds();
+                geofences.forEach(geofence => {
+                    bounds.extend({
+                        lat: geofence.centerLatitude,
+                        lng: geofence.centerLongitude
+                    });
+                });
+                map.fitBounds(bounds);
+            }
+        }
+    </script>
+}

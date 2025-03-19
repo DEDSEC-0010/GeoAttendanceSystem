@@ -46,6 +46,7 @@ builder.Services.AddHttpClient<IAttendanceService, AttendanceService>(client =>
 
 builder.Services.AddHttpClient<IGeofenceService, GeofenceService>();
 builder.Services.AddHttpClient<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
 
 // Build app
 var app = builder.Build();

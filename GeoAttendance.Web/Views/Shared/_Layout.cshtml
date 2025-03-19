@@ -4,130 +4,202 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GeoAttendance System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme.css" /> <!-- Add this line -->
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <div class="d-flex flex-column min-vh-100">
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <div class="container-fluid">
-                    <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                        <i class="fas fa-location-dot me-2"></i>
-                        GeoAttendance
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-location-dot me-2"></i>
+                    GeoAttendance
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav me-auto">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                               asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+
+                        @if (User.IsInRole("Admin"))
+                        {
                             <li class="nav-item">
-                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
-                                   asp-controller="Home" asp-action="Index">
-                                    <i class="fas fa-home"></i> Home
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Geofence" ? "active" : "")"
+                                   asp-controller="Geofence" asp-action="Index">
+                                    <i class="fas fa-map-marker-alt"></i> Geofences
                                 </a>
                             </li>
-
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Geofence" ? "active" : "")"
-                                       asp-controller="Geofence" asp-action="Index">
-                                        <i class="fas fa-map-marker-alt"></i> Manage Geofences
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
-                                       asp-controller="Reports" asp-action="Index">
-                                        <i class="fas fa-chart-bar"></i> Reports
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")"
-                                       asp-controller="Users" asp-action="Index">
-                                        <i class="fas fa-users"></i> Users
-                                    </a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Attendance" ? "active" : "")"
-                                       asp-controller="Attendance" asp-action="MarkAttendance">
-                                        <i class="fas fa-clock"></i> Mark Attendance
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Attendance" ? "active" : "")"
-                                       asp-controller="Attendance" asp-action="MyHistory">
-                                        <i class="fas fa-history"></i> My Attendance
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-
-                        <!-- Right-aligned items -->
-                        <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
-                                <span class="nav-link">
-                                    <i class="far fa-clock"></i>
-                                    <span id="utcTime"></span>
-                                </span>
+                                <a class="nav-link" asp-controller="Admin" asp-action="Reports">
+                                    <i class="fas fa-file-alt"></i> Reports
+                                </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")"
+                                   asp-controller="Users" asp-action="Index">
+                                    <i class="fas fa-users"></i> Users
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "MarkAttendance" ? "active" : "")"
+                                   asp-controller="Attendance" asp-action="MarkAttendance">
+                                    <i class="fas fa-clock"></i> Mark Attendance
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "MyHistory" ? "active" : "")"
+                                   asp-controller="Attendance" asp-action="MyHistory">
+                                    <i class="fas fa-history"></i> My Attendance
+                                </a>
+                            </li>
+                        }
+                    </ul>
 
+                    <ul class="navbar-nav align-items-center">
+                        <li class="nav-item me-3">
+                            <span class="nav-link time-display">
+                                <i class="far fa-clock me-2"></i>
+                                <span id="currentTime">2025-03-11 09:43:40</span> UTC
+                            </span>
+                        </li>
+
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle"></i>
-                                    @User.Identity?.Name
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span class="user-name">@User.Identity?.Name</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="fas fa-id-card"></i> Profile
+                                            <i class="fas fa-id-card me-2"></i> Profile
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post">
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-sign-out-alt me-2"></i> Logout
                                             </button>
                                         </form>
                                     </li>
                                 </ul>
                             </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <main class="flex-grow-1 py-4">
-            <div class="container-fluid">
-                @RenderBody()
-            </div>
-        </main>
-
-        <footer class="footer bg-light py-3 mt-auto border-top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start">
-                        <span>&copy; @DateTime.Now.Year - GeoAttendance System</span>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                        <span class="text-muted">Version 1.0.0</span>
-                    </div>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Login
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-        </footer>
-    </div>
+        </nav>
+    </header>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <main class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start">
+                    <span>&copy; @DateTime.Now.Year GeoAttendance</span>
+                </div>
+                <div class="col-md-4 text-center my-2 my-md-0">
+                    <span class="time-display small">
+                        <i class="far fa-clock me-1"></i>
+                        <span id="footerTime">2025-03-11 09:43:40</span> UTC
+                    </span>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <span class="user-info">
+                        <i class="fas fa-user me-1"></i>
+                        @(User.Identity?.Name ?? "Guest")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Update time with the specified format
+        function updateTime() {
+            const now = new Date();
+            const year = now.getUTCFullYear();
+            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(now.getUTCDate()).padStart(2, '0');
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+
+            const timeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            document.getElementById('currentTime').textContent = timeString;
+            document.getElementById('footerTime').textContent = timeString;
+        }
+
+        // Update time immediately and then every second
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Enable dropdowns
+        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+        var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+            return new bootstrap.Dropdown(dropdownToggleEl)
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Attendance Reports";
+}
+
+<div class="container mt-4">
+    <h2>Attendance Reports</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Generate Attendance Report</h5>
+            <p class="card-text">Click the button below to generate and download the attendance report.</p>
+
+            <form asp-action="GenerateReport" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Generate Report
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add any JavaScript functionality if needed
+    </script>
+}

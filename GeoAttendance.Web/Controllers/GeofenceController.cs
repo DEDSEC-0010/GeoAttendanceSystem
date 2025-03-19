@@ -136,8 +136,17 @@ namespace GeoAttendance.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Map()
         {
-            var geofences = await _geofenceService.GetAllGeofencesAsync();
-            return View(geofences);
+            try
+            {
+                var geofences = await _geofenceService.GetAllGeofencesAsync();
+                return View(geofences);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching geofences for map view");
+                TempData["Error"] = "Failed to load geofence map.";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }
