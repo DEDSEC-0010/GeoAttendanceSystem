@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using ClosedXML.Excel;
 using GeoAttendance.Web;
 using GeoAttendance.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,11 +35,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim(ClaimTypes.Role, "Employee"));
 });
 
+builder.Services.AddHttpClient<IAttendanceService, AttendanceService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
+});
+
+
+
 
 
 builder.Services.AddHttpClient<IGeofenceService, GeofenceService>();
 builder.Services.AddHttpClient<IAttendanceService, AttendanceService>();
-
 
 // Build app
 var app = builder.Build();

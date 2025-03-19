@@ -6,9 +6,14 @@
 <div class="container py-4">
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h4 class="card-title mb-0">
-                <i class="fas fa-history"></i> My Attendance History
-            </h4>
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-history"></i> My Attendance History
+                </h4>
+                <a asp-action="MarkAttendance" class="btn btn-light">
+                    <i class="fas fa-plus"></i> Mark Attendance
+                </a>
+            </div>
         </div>
         <div class="card-body">
             @if (!Model.Any())
@@ -19,6 +24,33 @@
             }
             else
             {
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Present Days</h5>
+                                <h3 class="mb-0">@Model.Count(r => r.IsPresent)</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Absent Days</h5>
+                                <h3 class="mb-0">@Model.Count(r => !r.IsPresent)</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Records</h5>
+                                <h3 class="mb-0">@Model.Count()</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -27,6 +59,7 @@
                                 <th>Time</th>
                                 <th>Location</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,6 +74,14 @@
                                             @record.Status
                                         </span>
                                     </td>
+                                    <td>
+                                        <a href="https://www.google.com/maps?q=@record.Latitude,@record.Longitude"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="View Location">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -50,3 +91,18 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Enable tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Highlight current day's record
+            const today = new Date().toISOString().split('T')[0];
+            $('td').filter(function() {
+                return $(this).text() === today;
+            }).closest('tr').addClass('table-info');
+        });
+    </script>
+}

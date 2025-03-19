@@ -4,7 +4,7 @@ namespace GeoAttendance.Web.Services
 {
     public interface IAttendanceService
     {
-        Task<bool> MarkAttendanceAsync(AttendanceViewModel model);
+        Task<(bool Success, string Message)> MarkAttendanceAsync(AttendanceViewModel model);
         Task<IEnumerable<AttendanceRecordViewModel>> GetUserAttendanceHistoryAsync();
     }
 }

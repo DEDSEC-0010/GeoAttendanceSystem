@@ -1,16 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GeoAttendance.Common.Models;
-public class AttendanceRecord
+namespace GeoAttendance.Common.Models
 {
-    public int Id { get; set; }
-    public DateTime TimeStamp { get; set; }
-    public bool IsPresent { get; set; }
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
-    public int EmployeeId { get; set; }
+    public class AttendanceRecord
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string EmployeeId { get; set; }
+
+        [Required]
+        public DateTime Timestamp { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal Latitude { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal Longitude { get; set; }
+
+        [Required]
+        public bool IsPresent { get; set; }
+
+        public string DeviceId { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }
