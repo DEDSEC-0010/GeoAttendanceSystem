@@ -44,16 +44,47 @@ public class AuthService
 
     public async Task<User> Authenticate(string username, string password)
     {
-        // Explicit query construction
-        var query = _context.Users
-       .Where(u => u.Username == username)
-       .AsQueryable();  // Explicitly mark as queryable
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            throw new ArgumentException("Username and password are required");
 
-        var user = await query.FirstOrDefaultAsync();
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == username);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        if (user == null)
+            return null;
+
+        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             return null;
 
         return user;
+    }
+
+    public bool ValidateToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return false;
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+
+        try
+        {
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = _config["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _config["Jwt:Audience"],
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
