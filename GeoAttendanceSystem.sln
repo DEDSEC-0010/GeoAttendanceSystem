@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAttendance.API", "GeoAtt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAttendance.Common", "GeoAttendance.Common\GeoAttendance.Common.csproj", "{21924CD5-0CF1-486A-912A-4A7F4E072EFD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAttendance.Tests", "GeoAttendance.Tests\GeoAttendance.Tests.csproj", "{11CE1CC7-C045-47E1-B4C8-FA1131403E40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{21924CD5-0CF1-486A-912A-4A7F4E072EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21924CD5-0CF1-486A-912A-4A7F4E072EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21924CD5-0CF1-486A-912A-4A7F4E072EFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11CE1CC7-C045-47E1-B4C8-FA1131403E40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CE1CC7-C045-47E1-B4C8-FA1131403E40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CE1CC7-C045-47E1-B4C8-FA1131403E40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CE1CC7-C045-47E1-B4C8-FA1131403E40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
